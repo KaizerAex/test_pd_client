@@ -23,6 +23,7 @@ function App() {
     };
   }, []);
 
+
   // --- Пустые обработчики для будущего ---
   const handleGetBalance = async () => { setBalance(null); console.log('Get Balance clicked'); };
   const handleGetTransactions = async () => { setTransactions([]); console.log('Get Transactions clicked'); };
