@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { environmentService } from './services/EnvironmentService';
+import { playdeckService } from './services/playdeckService';
 import { Profile } from './types/playdeck';
 
 function App() {
@@ -21,12 +21,8 @@ function App() {
     
     window.addEventListener('playdeck:profile', handleProfile);
     
-    const initialize = async () => {
-        console.log('Initializing Environment Service...');
-        await environmentService.initializePlatformService();
-    };
-
-    initialize();
+    console.log('Initializing PlayDeck service...');
+    playdeckService.init();
 
     return () => {
       window.removeEventListener('playdeck:profile', handleProfile);
