@@ -25,11 +25,8 @@ api.interceptors.request.use((config) => {
   let dataToSign = '';
   
   if (config.method === 'post' || config.method === 'put' || config.method === 'patch') {
-    // Для POST-запросов добавляем gameId в тело
-    config.data = { ...config.data, gameId: GAME_ID };
     dataToSign = JSON.stringify(config.data);
   } else {
-    // Для GET-запросов добавляем gameId в query-параметры
     config.params = { ...config.params, gameId: GAME_ID };
     if (config.params) {
       const sortedParams = new URLSearchParams();
@@ -62,11 +59,11 @@ export const getTransactions = async (telegramId: string, limit: number = 20, of
 };
 
 export const createInvoice = async (telegramId: string, amount: number) => {
-  const response = await api.post('/playdeck/invoices', { telegramId, amount });
+  const response = await api.post('/playdeck/invoices', { telegramId, amount, gameId: GAME_ID });
   return response.data;
 };
 
 export const requestWithdrawal = async (telegramId: string, amount: number) => {
-  const response = await api.post('/balance/withdraw', { telegramId, amount });
+  const response = await api.post('/balance/withdraw', { telegramId, amount, gameId: GAME_ID });
   return response.data;
 }; 
