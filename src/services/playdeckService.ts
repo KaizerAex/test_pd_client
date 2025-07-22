@@ -84,6 +84,10 @@ class PlaydeckService {
     this.parent.postMessage(payload, '*');
   }
 
+  public isAvailable(): boolean {
+    return this.isPlaydeckEnvironment;
+  }
+
   public getPlaydeckState(): Promise<boolean> {
     return new Promise((resolve) => {
         const handler = (event: MessageEvent) => {

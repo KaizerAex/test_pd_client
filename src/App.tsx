@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { playdeckService } from './services/playdeckService';
+import { environmentService } from './services/EnvironmentService';
 import { Profile } from './types/playdeck';
 
 function App() {
-  const [status, setStatus] = useState('Initializing with PlayDeck...');
+  const [status, setStatus] = useState('Initializing...');
 
   useEffect(() => {
     const handleProfile = (event: Event) => {
@@ -11,18 +11,22 @@ function App() {
       const profile = customEvent.detail;
 
       if (profile) {
-        console.log('PlayDeck initialized, profile received:', profile);
+        console.log('Profile received:', profile);
         setStatus(`ОК, ID: ${profile.telegramId}`);
       } else {
-        console.log('Running in standalone mode or profile not available.');
+        console.log('Standalone mode or profile not available.');
         setStatus('ОК (Standalone)');
       }
     };
     
     window.addEventListener('playdeck:profile', handleProfile);
     
-    console.log('Initializing PlayDeck service...');
-    playdeckService.init();
+    const initialize = async () => {
+        console.log('Initializing Environment Service...');
+        await environmentService.initializePlatformService();
+    };
+
+    initialize();
 
     return () => {
       window.removeEventListener('playdeck:profile', handleProfile);
