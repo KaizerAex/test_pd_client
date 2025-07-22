@@ -26,10 +26,10 @@ function App() {
   }, []);
 
   // --- Пустые обработчики для будущего ---
-  const handleGetBalance = async () => { console.log('Get Balance clicked'); };
-  const handleGetTransactions = async () => { console.log('Get Transactions clicked'); };
-  const handleDeposit = async () => { console.log('Deposit clicked'); };
-  const handleWithdraw = async () => { console.log('Withdraw clicked'); };
+  const handleGetBalance = async () => { setBalance(null); console.log('Get Balance clicked'); };
+  const handleGetTransactions = async () => { setTransactions([]); console.log('Get Transactions clicked'); };
+  const handleDeposit = async () => { setApiResponse('Deposit clicked'); console.log('Deposit clicked'); };
+  const handleWithdraw = async () => { setApiResponse('Withdraw clicked'); console.log('Withdraw clicked'); };
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '1rem', maxWidth: '800px', margin: 'auto' }}>
