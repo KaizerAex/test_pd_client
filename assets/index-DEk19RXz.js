@@ -16063,7 +16063,6 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   let dataToSign = "";
   if (config.method === "post" || config.method === "put" || config.method === "patch") {
-    config.data = { ...config.data, gameId: GAME_ID };
     dataToSign = JSON.stringify(config.data);
   } else {
     config.params = { ...config.params, gameId: GAME_ID };
@@ -16093,11 +16092,11 @@ const getTransactions = async (telegramId, limit = 20, offset = 0) => {
   return response.data;
 };
 const createInvoice = async (telegramId, amount) => {
-  const response = await api.post("/playdeck/invoices", { telegramId, amount });
+  const response = await api.post("/playdeck/invoices", { telegramId, amount, gameId: GAME_ID });
   return response.data;
 };
 const requestWithdrawal = async (telegramId, amount) => {
-  const response = await api.post("/balance/withdraw", { telegramId, amount });
+  const response = await api.post("/balance/withdraw", { telegramId, amount, gameId: GAME_ID });
   return response.data;
 };
 function App() {
