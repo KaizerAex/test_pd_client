@@ -23,7 +23,7 @@ function App() {
     
     console.log('Initializing PlayDeck service...');
     playdeckService.init();
-
+    console.log('UseEffect finished');
     return () => {
       window.removeEventListener('playdeck:profile', handleProfile);
     };

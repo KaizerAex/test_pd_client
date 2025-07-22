@@ -14,7 +14,7 @@ class PlaydeckService {
     try {
       this.isPlaydeckEnvironment = window.parent !== window;
       this.setupEventListeners();
-
+      console.log('init started');
       if (this.isPlaydeckEnvironment) {
         console.log('Running in Playdeck environment');
         this.sendMessage('loading');
