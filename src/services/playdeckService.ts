@@ -87,6 +87,10 @@ class PlaydeckService {
     this.sendMessage('getPlaydeckState');
   }
 
+  public isMenuOpened(): boolean {
+    return this.isPlaydeckOpened;
+  }
+
   public isPlaydeck(): boolean {
     return this.isPlaydeckEnvironment;
   }
