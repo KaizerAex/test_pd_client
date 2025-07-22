@@ -5,6 +5,8 @@ const API_SECRET = import.meta.env.VITE_API_SECRET;
 const BALANCE_SERVICE_URL = import.meta.env.VITE_BALANCE_SERVICE_URL;
 const GAME_ID = import.meta.env.VITE_GAME_ID;
 
+console.log('VITE_BALANCE_SERVICE_URL from .env:', BALANCE_SERVICE_URL);
+
 const api = axios.create({
   baseURL: BALANCE_SERVICE_URL,
 });
@@ -15,6 +17,9 @@ api.interceptors.request.use((config) => {
   }
   if (!GAME_ID) {
     throw new Error('Missing VITE_GAME_ID in .env file');
+  }
+  if (!BALANCE_SERVICE_URL) {
+    throw new Error('Missing or empty VITE_BALANCE_SERVICE_URL in .env file');
   }
 
   config.params = { ...config.params, gameId: GAME_ID };
@@ -33,7 +38,7 @@ api.interceptors.request.use((config) => {
 });
 
 export const getBalance = async (telegramId: string) => {
-  const response = await api.get(`/balance/${telegramId}`);
+  const response = await api.get(`/balance/balance/${telegramId}`);
   return response.data;
 };
 

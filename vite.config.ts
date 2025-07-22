@@ -5,4 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/test_pd_client/',
   plugins: [react()],
+  build: {
+    minify: false,
+  },
 }) 
