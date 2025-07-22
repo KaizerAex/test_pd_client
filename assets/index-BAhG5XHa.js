@@ -16061,11 +16061,12 @@ const api = axios.create({
   baseURL: BALANCE_SERVICE_URL
 });
 api.interceptors.request.use((config) => {
-  config.params = { ...config.params, gameId: GAME_ID };
   let dataToSign = "";
   if (config.method === "post" || config.method === "put" || config.method === "patch") {
+    config.data = { ...config.data, gameId: GAME_ID };
     dataToSign = JSON.stringify(config.data);
   } else {
+    config.params = { ...config.params, gameId: GAME_ID };
     if (config.params) {
       const sortedParams = new URLSearchParams();
       Object.keys(config.params).sort().forEach((key) => {
