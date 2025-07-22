@@ -39,6 +39,7 @@ api.interceptors.request.use((config) => {
   }
   
   const signature = CryptoJS.HmacSHA256(dataToSign, API_SECRET).toString(CryptoJS.enc.Hex);
+  console.log(dataToSign);
   config.headers['x-request-signature'] = signature;
   
   return config;
