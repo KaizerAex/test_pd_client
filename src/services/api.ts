@@ -38,7 +38,9 @@ api.interceptors.request.use((config) => {
 });
 
 export const getBalance = async (telegramId: string) => {
-  const response = await api.get(`/balance/balance/${telegramId}`);
+  const response = await api.get('/balance/balance', {
+    params: { telegramId },
+  });
   return response.data;
 };
 
