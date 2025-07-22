@@ -22,13 +22,15 @@ api.interceptors.request.use((config) => {
     throw new Error('Missing or empty VITE_BALANCE_SERVICE_URL in .env file');
   }
 
-  config.params = { ...config.params, gameId: GAME_ID };
-
   let dataToSign = '';
+  
   if (config.method === 'post' || config.method === 'put' || config.method === 'patch') {
+    // Для POST-запросов добавляем gameId в тело
+    config.data = { ...config.data, gameId: GAME_ID };
     dataToSign = JSON.stringify(config.data);
   } else {
-    // For GET, DELETE requests
+    // Для GET-запросов добавляем gameId в query-параметры
+    config.params = { ...config.params, gameId: GAME_ID };
     if (config.params) {
       const sortedParams = new URLSearchParams();
       Object.keys(config.params).sort().forEach(key => {
