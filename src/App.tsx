@@ -1,27 +1,25 @@
 import { useState, useEffect } from 'react';
+import { playdeckService } from './services/playdeckService';
+import { Profile } from './types/playdeck';
 
 function App() {
-  const [telegramId, setTelegramId] = useState<string | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [balance, setBalance] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [apiResponse, setApiResponse] = useState<string>('');
   const [amount, setAmount] = useState<number>(10);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Здесь можно добавить проверку на event.origin для безопасности
-      if (event.data && event.data.type === 'playdeck-user-info') {
-        setTelegramId(event.data.payload.id);
-      }
+    const handleProfile = (event: Event) => {
+      const customEvent = event as CustomEvent<Profile | null>;
+      setProfile(customEvent.detail);
     };
 
-    window.addEventListener('message', handleMessage);
-
-    // Этот код останется для будущих поколений, как напоминание о былых временах
-    // setTelegramId('123456789');
+    window.addEventListener('playdeck:profile', handleProfile);
+    playdeckService.init();
 
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener('playdeck:profile', handleProfile);
     };
   }, []);
 
@@ -36,7 +34,7 @@ function App() {
       <h1>Тестовый стенд для balance_service</h1>
       
       <div style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
-        <p><b>Telegram ID:</b> {telegramId || 'Ожидание данных от PlayDeck...'}</p>
+        <p><b>Telegram ID:</b> {profile?.telegramId || 'Ожидание данных от PlayDeck...'}</p>
       </div>
       
       <div style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem', borderRadius: '8px', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -44,12 +42,13 @@ function App() {
           Сумма:
           <input type="number" value={amount} onChange={(e) => setAmount(Number(e.target.value))} style={{ marginLeft: '0.5rem', width: '80px' }} />
         </label>
-        <button onClick={handleGetBalance} disabled={!telegramId}>Получить баланс</button>
-        <button onClick={handleGetTransactions} disabled={!telegramId}>Получить транзакции</button>
-        <button onClick={handleDeposit} disabled={!telegramId}>Пополнить</button>
-        <button onClick={handleWithdraw} disabled={!telegramId}>Вывести</button>
+        <button onClick={handleGetBalance} disabled={!profile}>Получить баланс</button>
+        <button onClick={handleGetTransactions} disabled={!profile}>Получить транзакции</button>
+        <button onClick={handleDeposit} disabled={!profile}>Пополнить</button>
+        <button onClick={handleWithdraw} disabled={!profile}>Вывести</button>
       </div>
 
+      {/* Остальной UI без изменений */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <div style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
           <h2>Баланс</h2>
