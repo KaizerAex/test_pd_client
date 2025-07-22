@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { playdeckService } from './services/playdeckService';
 import { Profile } from './types/playdeck';
+import { getBalance, getTransactions, createInvoice, requestWithdrawal } from './services/api';
 
 function App() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -24,11 +25,42 @@ function App() {
   }, []);
 
 
-  // --- Пустые обработчики для будущего ---
-  const handleGetBalance = async () => { setBalance(null); console.log('Get Balance clicked'); };
-  const handleGetTransactions = async () => { setTransactions([]); console.log('Get Transactions clicked'); };
-  const handleDeposit = async () => { setApiResponse('Deposit clicked'); console.log('Deposit clicked'); };
-  const handleWithdraw = async () => { setApiResponse('Withdraw clicked'); console.log('Withdraw clicked'); };
+  const handleGetBalance = async () => {
+    if (!profile) return;
+    try {
+      const data = await getBalance(String(profile.telegramId));
+      setBalance(data);
+    } catch (error: any) {
+      setApiResponse(JSON.stringify(error.response?.data || error.message, null, 2));
+    }
+  };
+  const handleGetTransactions = async () => {
+    if (!profile) return;
+    try {
+      const data = await getTransactions(String(profile.telegramId));
+      setTransactions(data);
+    } catch (error: any) {
+      setApiResponse(JSON.stringify(error.response?.data || error.message, null, 2));
+    }
+  };
+  const handleDeposit = async () => {
+    if (!profile) return;
+    try {
+      const data = await createInvoice(String(profile.telegramId), amount);
+      setApiResponse(JSON.stringify(data, null, 2));
+    } catch (error: any) {
+      setApiResponse(JSON.stringify(error.response?.data || error.message, null, 2));
+    }
+  };
+  const handleWithdraw = async () => {
+    if (!profile) return;
+    try {
+      const data = await requestWithdrawal(String(profile.telegramId), amount);
+      setApiResponse(JSON.stringify(data, null, 2));
+    } catch (error: any) {
+      setApiResponse(JSON.stringify(error.response?.data || error.message, null, 2));
+    }
+  };
 
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '1rem', maxWidth: '800px', margin: 'auto' }}>
