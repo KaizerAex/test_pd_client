@@ -83,8 +83,18 @@ class PlaydeckService {
     this.parent.postMessage(payload, '*');
   }
 
-  public getPlaydeckState(): void {
-    this.sendMessage('getPlaydeckState');
+  public getPlaydeckState(): Promise<boolean> {
+    return new Promise((resolve) => {
+        const handler = (event: MessageEvent) => {
+            const playdeck = event.data?.playdeck;
+            if (playdeck?.method === 'getPlaydeckState') {
+                window.removeEventListener('message', handler);
+                resolve(playdeck.value as boolean);
+            }
+        };
+        window.addEventListener('message', handler);
+        this.sendMessage('getPlaydeckState');
+    });
   }
 
   public isMenuOpened(): boolean {
