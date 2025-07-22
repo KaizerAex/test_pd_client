@@ -16140,8 +16140,15 @@ function App() {
     var _a;
     if (!profile) return;
     try {
-      const data = await createInvoice(String(profile.telegramId), amount);
-      setApiResponse(JSON.stringify(data, null, 2));
+      const invoiceData = await createInvoice(String(profile.telegramId), amount);
+      setApiResponse(JSON.stringify(invoiceData, null, 2));
+      if (invoiceData.externalId && playdeckService.isAvailable()) {
+        playdeckService.requestPayment(
+          invoiceData.amount,
+          invoiceData.description,
+          invoiceData.externalId
+        );
+      }
     } catch (error) {
       setApiResponse(JSON.stringify(((_a = error.response) == null ? void 0 : _a.data) || error.message, null, 2));
     }
