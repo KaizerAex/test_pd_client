@@ -3,6 +3,7 @@ import { PlaydeckMessage, Profile } from '../types/playdeck';
 class PlaydeckService {
   private parent: Window;
   private isPlaydeckEnvironment: boolean = false;
+  private isPlaydeckOpened: boolean = false;
   private userProfile: Profile | null = null;
 
   constructor() {
@@ -13,7 +14,7 @@ class PlaydeckService {
     try {
       this.isPlaydeckEnvironment = window.parent !== window;
       this.setupEventListeners();
-      console.log('isPlaydeckEnvironment', this.isPlaydeckEnvironment);
+
       if (this.isPlaydeckEnvironment) {
         console.log('Running in Playdeck environment');
         this.sendMessage('loading');
@@ -24,6 +25,7 @@ class PlaydeckService {
           }, 500);
         });
 
+        this.getPlaydeckState();
         this.requestUserProfile();
       } else {
         console.log('Running standalone, dispatching fake profile event');
@@ -41,6 +43,10 @@ class PlaydeckService {
       if (!data || !data['playdeck']) return;
 
       const pdData = data['playdeck'] as PlaydeckMessage;
+      
+      if (pdData.method === 'getPlaydeckState') {
+        this.isPlaydeckOpened = pdData.value as boolean;
+      }
 
       if (pdData.method === 'getUserProfile') {
         this.userProfile = pdData.value as Profile;
@@ -75,6 +81,10 @@ class PlaydeckService {
     }
 
     this.parent.postMessage(payload, '*');
+  }
+
+  public getPlaydeckState(): void {
+    this.sendMessage('getPlaydeckState');
   }
 
   public isPlaydeck(): boolean {
