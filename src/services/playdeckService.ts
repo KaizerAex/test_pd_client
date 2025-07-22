@@ -13,7 +13,7 @@ class PlaydeckService {
     try {
       this.isPlaydeckEnvironment = window.parent !== window;
       this.setupEventListeners();
-
+      console.log('isPlaydeckEnvironment', this.isPlaydeckEnvironment);
       if (this.isPlaydeckEnvironment) {
         console.log('Running in Playdeck environment');
         this.sendMessage('loading');
