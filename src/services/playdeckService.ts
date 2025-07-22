@@ -7,12 +7,12 @@ class PlaydeckService {
 
   constructor() {
     this.parent = window.parent.window;
-    this.setupEventListeners();
   }
 
   public init(): void {
     try {
       this.isPlaydeckEnvironment = window.parent !== window;
+      this.setupEventListeners();
 
       if (this.isPlaydeckEnvironment) {
         console.log('Running in Playdeck environment');
@@ -27,7 +27,6 @@ class PlaydeckService {
         this.requestUserProfile();
       } else {
         console.log('Running standalone, dispatching fake profile event');
-        // В автономном режиме мы можем сгенерировать фейковый профиль для тестирования
         window.dispatchEvent(new CustomEvent('playdeck:profile', { detail: null }));
       }
     } catch (error) {
