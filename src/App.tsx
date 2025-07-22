@@ -46,8 +46,18 @@ function App() {
   const handleDeposit = async () => {
     if (!profile) return;
     try {
-      const data = await createInvoice(String(profile.telegramId), amount);
-      setApiResponse(JSON.stringify(data, null, 2));
+      const invoiceData = await createInvoice(String(profile.telegramId), amount);
+      setApiResponse(JSON.stringify(invoiceData, null, 2));
+
+      // Теперь вызываем метод оплаты Playdeck с данными из инвойса
+      if (invoiceData.externalId && playdeckService.isAvailable()) {
+        playdeckService.requestPayment(
+          invoiceData.amount,
+          invoiceData.description,
+          invoiceData.externalId
+        );
+      }
+      
     } catch (error: any) {
       setApiResponse(JSON.stringify(error.response?.data || error.message, null, 2));
     }
