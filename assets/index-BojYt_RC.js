@@ -16073,7 +16073,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 const getBalance = async (telegramId) => {
-  const response = await api.get(`/balance/balance/${telegramId}`);
+  const response = await api.get("/balance/balance", {
+    params: { telegramId }
+  });
   return response.data;
 };
 const getTransactions = async (telegramId, limit = 20, offset = 0) => {
