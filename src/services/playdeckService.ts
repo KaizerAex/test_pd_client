@@ -7,38 +7,37 @@ class PlaydeckService {
 
   constructor() {
     this.parent = window.parent.window;
+    this.setupEventListeners();
   }
 
-  public init(): Promise<Profile | null> {
-    return new Promise((resolve) => {
-      try {
-        this.isPlaydeckEnvironment = window.parent !== window;
-        this.setupEventListeners(resolve);
+  public init(): void {
+    try {
+      this.isPlaydeckEnvironment = window.parent !== window;
 
-        if (this.isPlaydeckEnvironment) {
-          console.log('Running in Playdeck environment');
-          this.sendMessage('loading');
+      if (this.isPlaydeckEnvironment) {
+        console.log('Running in Playdeck environment');
+        this.sendMessage('loading');
 
-          window.addEventListener('load', () => {
-            setTimeout(() => {
-              this.sendMessage('loading', 100);
-            }, 500);
-          });
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            this.sendMessage('loading', 100);
+          }, 500);
+        });
 
-          this.requestUserProfile();
-        } else {
-          console.log('Running standalone');
-          resolve(null);
-        }
-      } catch (error) {
-        console.error('Error initializing Playdeck:', error);
-        this.isPlaydeckEnvironment = false;
-        resolve(null);
+        this.requestUserProfile();
+      } else {
+        console.log('Running standalone, dispatching fake profile event');
+        // В автономном режиме мы можем сгенерировать фейковый профиль для тестирования
+        window.dispatchEvent(new CustomEvent('playdeck:profile', { detail: null }));
       }
-    });
+    } catch (error) {
+      console.error('Error initializing Playdeck:', error);
+      this.isPlaydeckEnvironment = false;
+      window.dispatchEvent(new CustomEvent('playdeck:profile', { detail: null }));
+    }
   }
 
-  private setupEventListeners(resolve: (profile: Profile | null) => void): void {
+  private setupEventListeners(): void {
     window.addEventListener('message', ({ data }) => {
       if (!data || !data['playdeck']) return;
 
@@ -51,7 +50,6 @@ class PlaydeckService {
             detail: this.userProfile,
           })
         );
-        resolve(this.userProfile);
       }
 
       if (pdData.method === 'requestPayment') {
