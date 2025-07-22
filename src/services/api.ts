@@ -25,10 +25,17 @@ api.interceptors.request.use((config) => {
   config.params = { ...config.params, gameId: GAME_ID };
 
   let dataToSign = '';
-  if (config.method === 'post') {
+  if (config.method === 'post' || config.method === 'put' || config.method === 'patch') {
     dataToSign = JSON.stringify(config.data);
   } else {
-    dataToSign = new URLSearchParams(config.params).toString();
+    // For GET, DELETE requests
+    if (config.params) {
+      const sortedParams = new URLSearchParams();
+      Object.keys(config.params).sort().forEach(key => {
+        sortedParams.append(key, config.params[key]);
+      });
+      dataToSign = sortedParams.toString();
+    }
   }
   
   const signature = CryptoJS.HmacSHA256(dataToSign, API_SECRET).toString(CryptoJS.enc.Hex);
