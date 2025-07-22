@@ -19,11 +19,12 @@ class PlaydeckService {
         console.log('Running in Playdeck environment');
         this.sendMessage('loading');
 
-        window.addEventListener('load', () => {
-          setTimeout(() => {
-            this.sendMessage('loading', 100);
-          }, 500);
-        });
+        // Отправляем сигнал о полной загрузке через фиксированную задержку,
+        // а не по событию window.load, чтобы избежать проблем с синхронизацией.
+        setTimeout(() => {
+          console.log('Sending loading: 100');
+          this.sendMessage('loading', 100);
+        }, 3000);
 
         this.getPlaydeckState();
         this.requestUserProfile();
