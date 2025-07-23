@@ -16121,6 +16121,7 @@ function App() {
     const handleProfile = (event) => {
       const customEvent = event;
       const userProfile = customEvent.detail;
+      console.log("userProfile", JSON.stringify(userProfile, null, 2));
       setProfile(userProfile);
       if (userProfile && userProfile.token) {
         console.log("--- PLAYDECK JWT TOKEN RECEIVED ---");
