@@ -63,7 +63,7 @@ export const createInvoice = async (telegramId: string, amount: number) => {
   return response.data;
 };
 
-export const requestWithdrawal = async (telegrma_username: string, amount: number) => {
-  const response = await api.post('/balance/withdraw', { telegrma_username, amount, gameId: GAME_ID });
+export const requestWithdrawal = async (telegramId: string, amount: number, metadata: any) => {
+  const response = await api.post('/balance/withdraw', { telegramId, amount, gameId: GAME_ID, metadata });
   return response.data;
 }; 
