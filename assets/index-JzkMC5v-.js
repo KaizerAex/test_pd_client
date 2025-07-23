@@ -7084,8 +7084,27 @@ class PlaydeckService {
             detail: pdData.value
           })
         );
+        if (pdData.value && typeof pdData.value === "object" && "url" in pdData.value) {
+          console.log("[PlaydeckService] Received invoice URL, opening:", pdData.value.url);
+          this.openTelegramInvoice(pdData.value.url);
+        }
       }
     });
+  }
+  openTelegramInvoice(url) {
+    var _a;
+    const webApp = (_a = window.Telegram) == null ? void 0 : _a.WebApp;
+    if (webApp && webApp.openInvoice) {
+      webApp.openInvoice(url, (status) => {
+        console.log(`[PlaydeckService] Invoice status: ${status}`);
+        window.dispatchEvent(new CustomEvent("playdeck:invoiceStatus", {
+          detail: { status, url }
+        }));
+      });
+    } else {
+      console.warn("[PlaydeckService] Telegram WebApp not found. Opening in new tab as fallback.");
+      window.open(url, "_blank");
+    }
   }
   sendMessage(method, value) {
     if (!this.isPlaydeckEnvironment) return;
