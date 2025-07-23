@@ -59,13 +59,38 @@ class PlaydeckService {
       }
 
       if (pdData.method === 'requestPayment') {
+        // Playdeck sends back the payment info, including the URL to open
         window.dispatchEvent(
             new CustomEvent('playdeck:payment', {
                 detail: pdData.value,
             })
         );
+        
+        // CRITICAL: Open the payment invoice using the official Telegram method
+        if (pdData.value && typeof pdData.value === 'object' && 'url' in pdData.value) {
+            console.log('[PlaydeckService] Received invoice URL, opening:', pdData.value.url);
+            this.openTelegramInvoice(pdData.value.url as string);
+        }
       }
     });
+  }
+
+  private openTelegramInvoice(url: string): void {
+    const webApp = (window as any).Telegram?.WebApp;
+    if (webApp && webApp.openInvoice) {
+      // Use the official Telegram method to open invoices
+      webApp.openInvoice(url, (status: string) => {
+        console.log(`[PlaydeckService] Invoice status: ${status}`);
+        // Optionally, dispatch an event with the status
+        window.dispatchEvent(new CustomEvent('playdeck:invoiceStatus', {
+            detail: { status, url },
+        }));
+      });
+    } else {
+      // Fallback for non-Telegram environments
+      console.warn('[PlaydeckService] Telegram WebApp not found. Opening in new tab as fallback.');
+      window.open(url, '_blank');
+    }
   }
 
   private sendMessage(method: string, value?: unknown): void {
