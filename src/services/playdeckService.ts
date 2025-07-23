@@ -1,4 +1,6 @@
-import { PlaydeckMessage, Profile } from '../types/playdeck';
+import { PlaydeckMessage, Profile, PaymentRequest } from '../types/playdeck';
+
+
 
 class PlaydeckService {
   private parent: Window;
@@ -14,7 +16,7 @@ class PlaydeckService {
     try {
       this.isPlaydeckEnvironment = window.parent !== window;
       this.setupEventListeners();
-      console.log('init started');
+
       if (this.isPlaydeckEnvironment) {
         console.log('Running in Playdeck environment');
         this.sendMessage('loading');
@@ -24,7 +26,7 @@ class PlaydeckService {
         setTimeout(() => {
           console.log('Sending loading: 100');
           this.sendMessage('loading', 100);
-        }, 3000);
+        }, 1500);
 
         this.getPlaydeckState();
         this.requestUserProfile();
@@ -58,44 +60,25 @@ class PlaydeckService {
         );
       }
 
+      // Handle payment responses
       if (pdData.method === 'requestPayment') {
-        console.log('[PlaydeckService] Received response for requestPayment:', JSON.stringify(pdData.value, null, 2));
-
-        // Playdeck sends back the payment info, including the URL to open
         window.dispatchEvent(
             new CustomEvent('playdeck:payment', {
                 detail: pdData.value,
             })
         );
         
-        // CRITICAL: Open the payment invoice using the official Telegram method
+        // Auto-open payment URL if provided
         if (pdData.value && typeof pdData.value === 'object' && 'url' in pdData.value) {
-            console.log('[PlaydeckService] Found URL. Attempting to open invoice:', pdData.value.url);
-            this.openTelegramInvoice(pdData.value.url as string);
-        } else {
-            console.error('[PlaydeckService] Response received, but "url" field is missing or invalid.');
+            console.log('[PlaydeckService] Opening payment URL:', pdData.value.url);
+            this.openTelegramLink(pdData.value.url as string);
         }
-      }
+    }
+
     });
   }
 
-  private openTelegramInvoice(url: string): void {
-    const webApp = (window as any).Telegram?.WebApp;
-    if (webApp && webApp.openInvoice) {
-      // Use the official Telegram method to open invoices
-      webApp.openInvoice(url, (status: string) => {
-        console.log(`[PlaydeckService] Invoice status: ${status}`);
-        // Optionally, dispatch an event with the status
-        window.dispatchEvent(new CustomEvent('playdeck:invoiceStatus', {
-            detail: { status, url },
-        }));
-      });
-    } else {
-      // Fallback for non-Telegram environments
-      console.warn('[PlaydeckService] Telegram WebApp not found. Opening in new tab as fallback.');
-      window.open(url, '_blank');
-    }
-  }
+
 
   private sendMessage(method: string, value?: unknown): void {
     if (!this.isPlaydeckEnvironment) return;
@@ -149,6 +132,10 @@ class PlaydeckService {
 
   public requestPayment(amount: number, description: string, externalId: string): void {
     this.sendMessage('requestPayment', { amount, description, externalId });
+  }
+
+  public openTelegramLink(url: string): void {
+    this.sendMessage('openTelegramLink', url);
   }
 }
 

@@ -19,3 +19,10 @@ export interface PlaydeckMessage {
   data?: unknown;
   key?: string;
 }
+
+export interface PaymentRequest {
+  amount: number;
+  description: string;
+  externalId: string;
+  photoUrl?: string;
+}

@@ -5,6 +5,7 @@ import { getBalance, getTransactions, createInvoice, requestWithdrawal } from '.
 
 function App() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [playdeckToken, setPlaydeckToken] = useState<string | null>(null);
   const [balance, setBalance] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [apiResponse, setApiResponse] = useState<string>('');
@@ -13,7 +14,15 @@ function App() {
   useEffect(() => {
     const handleProfile = (event: Event) => {
       const customEvent = event as CustomEvent<Profile | null>;
-      setProfile(customEvent.detail);
+      const userProfile = customEvent.detail;
+      setProfile(userProfile);
+
+      if (userProfile && userProfile.token) {
+        console.log('--- PLAYDECK JWT TOKEN RECEIVED ---');
+        console.log(userProfile.token);
+        console.log('---------------------------------');
+        setPlaydeckToken(userProfile.token);
+      }
     };
 
     window.addEventListener('playdeck:profile', handleProfile);
@@ -78,6 +87,7 @@ function App() {
       
       <div style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
         <p><b>Telegram ID:</b> {profile?.telegramId || 'Ожидание данных от PlayDeck...'}</p>
+        <p style={{ wordBreak: 'break-all' }}><b>Playdeck JWT:</b> {playdeckToken || 'Нет токена'}</p>
       </div>
       
       <div style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem', borderRadius: '8px', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
