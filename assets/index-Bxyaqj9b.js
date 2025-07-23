@@ -7079,14 +7079,17 @@ class PlaydeckService {
         );
       }
       if (pdData.method === "requestPayment") {
+        console.log("[PlaydeckService] Received response for requestPayment:", JSON.stringify(pdData.value, null, 2));
         window.dispatchEvent(
           new CustomEvent("playdeck:payment", {
             detail: pdData.value
           })
         );
         if (pdData.value && typeof pdData.value === "object" && "url" in pdData.value) {
-          console.log("[PlaydeckService] Received invoice URL, opening:", pdData.value.url);
+          console.log("[PlaydeckService] Found URL. Attempting to open invoice:", pdData.value.url);
           this.openTelegramInvoice(pdData.value.url);
+        } else {
+          console.error('[PlaydeckService] Response received, but "url" field is missing or invalid.');
         }
       }
     });
