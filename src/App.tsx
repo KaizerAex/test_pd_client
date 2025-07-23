@@ -15,6 +15,7 @@ function App() {
     const handleProfile = (event: Event) => {
       const customEvent = event as CustomEvent<Profile | null>;
       const userProfile = customEvent.detail;
+      console.log('userProfile', JSON.stringify(userProfile, null, 2));
       setProfile(userProfile);
 
       if (userProfile && userProfile.token) {
