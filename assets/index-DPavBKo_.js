@@ -7043,14 +7043,13 @@ class PlaydeckService {
     try {
       this.isPlaydeckEnvironment = window.parent !== window;
       this.setupEventListeners();
-      console.log("init started");
       if (this.isPlaydeckEnvironment) {
         console.log("Running in Playdeck environment");
         this.sendMessage("loading");
         setTimeout(() => {
           console.log("Sending loading: 100");
           this.sendMessage("loading", 100);
-        }, 3e3);
+        }, 1500);
         this.getPlaydeckState();
         this.requestUserProfile();
       } else {
@@ -7079,35 +7078,17 @@ class PlaydeckService {
         );
       }
       if (pdData.method === "requestPayment") {
-        console.log("[PlaydeckService] Received response for requestPayment:", JSON.stringify(pdData.value, null, 2));
         window.dispatchEvent(
           new CustomEvent("playdeck:payment", {
             detail: pdData.value
           })
         );
         if (pdData.value && typeof pdData.value === "object" && "url" in pdData.value) {
-          console.log("[PlaydeckService] Found URL. Attempting to open invoice:", pdData.value.url);
-          this.openTelegramInvoice(pdData.value.url);
-        } else {
-          console.error('[PlaydeckService] Response received, but "url" field is missing or invalid.');
+          console.log("[PlaydeckService] Opening payment URL:", pdData.value.url);
+          this.openTelegramLink(pdData.value.url);
         }
       }
     });
-  }
-  openTelegramInvoice(url) {
-    var _a;
-    const webApp = (_a = window.Telegram) == null ? void 0 : _a.WebApp;
-    if (webApp && webApp.openInvoice) {
-      webApp.openInvoice(url, (status) => {
-        console.log(`[PlaydeckService] Invoice status: ${status}`);
-        window.dispatchEvent(new CustomEvent("playdeck:invoiceStatus", {
-          detail: { status, url }
-        }));
-      });
-    } else {
-      console.warn("[PlaydeckService] Telegram WebApp not found. Opening in new tab as fallback.");
-      window.open(url, "_blank");
-    }
   }
   sendMessage(method, value) {
     if (!this.isPlaydeckEnvironment) return;
@@ -7151,7 +7132,15 @@ class PlaydeckService {
     return this.userProfile;
   }
   requestPayment(amount, description, externalId) {
-    this.sendMessage("requestPayment", { amount, description, externalId });
+    const paymentData = {
+      amount,
+      description,
+      externalId
+    };
+    this.sendMessage("requestPayment", paymentData);
+  }
+  openTelegramLink(url) {
+    this.sendMessage("openTelegramLink", url);
   }
 }
 const playdeckService = new PlaydeckService();
@@ -16123,6 +16112,7 @@ const requestWithdrawal = async (telegramId, amount) => {
 };
 function App() {
   const [profile, setProfile] = reactExports.useState(null);
+  const [playdeckToken, setPlaydeckToken] = reactExports.useState(null);
   const [balance, setBalance] = reactExports.useState(null);
   const [transactions, setTransactions] = reactExports.useState([]);
   const [apiResponse, setApiResponse] = reactExports.useState("");
@@ -16130,7 +16120,14 @@ function App() {
   reactExports.useEffect(() => {
     const handleProfile = (event) => {
       const customEvent = event;
-      setProfile(customEvent.detail);
+      const userProfile = customEvent.detail;
+      setProfile(userProfile);
+      if (userProfile && userProfile.token) {
+        console.log("--- PLAYDECK JWT TOKEN RECEIVED ---");
+        console.log(userProfile.token);
+        console.log("---------------------------------");
+        setPlaydeckToken(userProfile.token);
+      }
     };
     window.addEventListener("playdeck:profile", handleProfile);
     playdeckService.init();
@@ -16187,11 +16184,18 @@ function App() {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { fontFamily: "sans-serif", padding: "1rem", maxWidth: "800px", margin: "auto" }, children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { children: "Тестовый стенд для balance_service" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem", borderRadius: "8px" }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("b", { children: "Telegram ID:" }),
-      " ",
-      (profile == null ? void 0 : profile.telegramId) || "Ожидание данных от PlayDeck..."
-    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem", borderRadius: "8px" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("b", { children: "Telegram ID:" }),
+        " ",
+        (profile == null ? void 0 : profile.telegramId) || "Ожидание данных от PlayDeck..."
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { style: { wordBreak: "break-all" }, children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("b", { children: "Playdeck JWT:" }),
+        " ",
+        playdeckToken || "Нет токена"
+      ] })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem", borderRadius: "8px", display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { children: [
         "Сумма:",
