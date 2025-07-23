@@ -131,7 +131,13 @@ class PlaydeckService {
   }
 
   public requestPayment(amount: number, description: string, externalId: string): void {
-    this.sendMessage('requestPayment', { amount, description, externalId });
+    const paymentData: PaymentRequest = {
+      amount,
+      description,
+      externalId,
+  };
+    
+    this.sendMessage('requestPayment', paymentData);
   }
 
   public openTelegramLink(url: string): void {
