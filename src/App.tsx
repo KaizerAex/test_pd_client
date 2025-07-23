@@ -75,7 +75,7 @@ function App() {
   const handleWithdraw = async () => {
     if (!profile) return;
     try {
-      const data = await requestWithdrawal(String(profile.telegramId), amount);
+      const data = await requestWithdrawal(String(profile.username), amount);
       setApiResponse(JSON.stringify(data, null, 2));
     } catch (error: any) {
       setApiResponse(JSON.stringify(error.response?.data || error.message, null, 2));
