@@ -59,6 +59,8 @@ class PlaydeckService {
       }
 
       if (pdData.method === 'requestPayment') {
+        console.log('[PlaydeckService] Received response for requestPayment:', JSON.stringify(pdData.value, null, 2));
+
         // Playdeck sends back the payment info, including the URL to open
         window.dispatchEvent(
             new CustomEvent('playdeck:payment', {
@@ -68,8 +70,10 @@ class PlaydeckService {
         
         // CRITICAL: Open the payment invoice using the official Telegram method
         if (pdData.value && typeof pdData.value === 'object' && 'url' in pdData.value) {
-            console.log('[PlaydeckService] Received invoice URL, opening:', pdData.value.url);
+            console.log('[PlaydeckService] Found URL. Attempting to open invoice:', pdData.value.url);
             this.openTelegramInvoice(pdData.value.url as string);
+        } else {
+            console.error('[PlaydeckService] Response received, but "url" field is missing or invalid.');
         }
       }
     });
