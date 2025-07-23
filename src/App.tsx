@@ -76,7 +76,8 @@ function App() {
     if (!profile) return;
     try {
       const metadata = {reason: 'test', username: profile.username};
-      const data = await requestWithdrawal(String(profile.telegramId), amount, metadata, description='test_game_test_transactions');
+      const description = 'test_game_test_transactions';
+      const data = await requestWithdrawal(String(profile.telegramId), amount, metadata, description);
       setApiResponse(JSON.stringify(data, null, 2));
     } catch (error: any) {
       setApiResponse(JSON.stringify(error.response?.data || error.message, null, 2));
