@@ -16065,7 +16065,7 @@ function requireBlowfish() {
 var cryptoJsExports = cryptoJs.exports;
 const CryptoJS = /* @__PURE__ */ getDefaultExportFromCjs(cryptoJsExports);
 const API_SECRET = "2a8ef0b10fc5ed8e91e13780b07b88a77398d8610e1d8e616c4d6b1978a19443";
-const BALANCE_SERVICE_URL = "http://45.120.178.144:4000";
+const BALANCE_SERVICE_URL = "https://balance.1daygaming.com";
 const GAME_ID = "test_game";
 console.log("VITE_BALANCE_SERVICE_URL from .env:", BALANCE_SERVICE_URL);
 const api = axios.create({
