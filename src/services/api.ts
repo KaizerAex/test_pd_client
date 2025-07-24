@@ -63,7 +63,7 @@ export const createInvoice = async (telegramId: string, amount: number) => {
   return response.data;
 };
 
-export const requestWithdrawal = async (telegramId: string, amount: number, metadata: any, description: string) => {
+export const requestWithdrawal = async (telegramId: string, amount: number, metadata: any) => {
 
   const requestBody = {
     telegramId: telegramId,
