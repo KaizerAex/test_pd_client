@@ -16106,8 +16106,15 @@ const createInvoice = async (telegramId, amount) => {
   const response = await api.post("/playdeck/invoices", { telegramId, amount, gameId: GAME_ID });
   return response.data;
 };
-const requestWithdrawal = async (telegramId, amount, metadata, description) => {
-  const response = await api.post("/balance/withdraw", { telegramId, amount, gameId: GAME_ID, metadata, description });
+const requestWithdrawal = async (telegramId, amount, metadata) => {
+  const requestBody = {
+    telegramId,
+    amount,
+    description: `Withdrawal of ${amount} stars.`,
+    gameId: GAME_ID,
+    metadata
+  };
+  const response = await api.post("/balance/withdraw", requestBody);
   return response.data;
 };
 function App() {
@@ -16178,8 +16185,7 @@ function App() {
     if (!profile) return;
     try {
       const metadata = { reason: "test", username: profile.username };
-      const description = "test_game_test_transactions";
-      const data = await requestWithdrawal(String(profile.telegramId), amount, metadata, description);
+      const data = await requestWithdrawal(String(profile.telegramId), amount, metadata);
       setApiResponse(JSON.stringify(data, null, 2));
     } catch (error) {
       setApiResponse(JSON.stringify(((_a = error.response) == null ? void 0 : _a.data) || error.message, null, 2));
